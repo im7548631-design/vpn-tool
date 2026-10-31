@@ -1,4 +1,4 @@
-module vpn-tool
+module github.com/im7548631-design/vpn-tool
 
 go 1.21
 
