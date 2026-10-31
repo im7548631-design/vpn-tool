@@ -8,7 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/spf13/cobra"
-	"vpn-tool/internal/commands/auth"
+	"github.com/im7548631-design/vpn-tool/internal/commands/auth"
 )
 
 const APIBase = "https://vpn-gateway-manager--jjajajjajahsh.replit.app"

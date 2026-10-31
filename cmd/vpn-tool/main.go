@@ -1,7 +1,7 @@
 package main
 
 import (
-	"vpn-tool/internal/commands"
+	"github.com/im7548631-design/vpn-tool/internal/commands"
 )
 
 func main() {
