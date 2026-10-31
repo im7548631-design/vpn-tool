@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/spf13/cobra"
@@ -93,10 +94,14 @@ func NewApiCmd() *cobra.Command {
 				return err
 			}
 
-			// Apply headers
+			// Apply headers properly from opts.requestHeaders
 			for _, header := range opts.requestHeaders {
-				// Simple header parsing logic can be added here
-				req.Header.Set("Authorization", "Bearer token-stub")
+				parts := strings.SplitN(header, ":", 2)
+				if len(parts) == 2 {
+					key := strings.TrimSpace(parts[0])
+					val := strings.TrimSpace(parts[1])
+					req.Header.Set(key, val)
+				}
 			}
 
 			client := &http.Client{}
@@ -131,7 +136,7 @@ func NewApiCmd() *cobra.Command {
 
 	fl := cmd.Flags()
 
-	fl.StringVar(&opts.hostname, "hostname", "", "The hostname for the request. Defaults to gitlab.com, or the authenticated host in the current directory.")
+	fl.StringVar(&opts.hostname, "hostname", "", "The hostname for the request.")
 	fl.StringVar(&opts.url, "url", "", "The full URL for the request.")
 	fl.StringVarP(&opts.requestMethod, "method", "X", "GET", "The HTTP method for the request.")
 	
@@ -139,14 +144,14 @@ func NewApiCmd() *cobra.Command {
 	fl.VarP(&fieldFlagValue{list: fieldList}, "field", "F", "Add a parameter of inferred type. Using this flag changes the default HTTP method to POST.")
 	fl.VarP(&fieldFlagValue{list: fieldList, raw: true}, "raw-field", "f", "Add a string parameter.")
 	
-	fl.StringArrayVar(&opts.formFields, "form", nil, "Add a multipart form field. To upload a file, prefix the value with @ followed by the file path. To read from standard input, use @- (at most once). Using this flag changes the default HTTP method to POST.")
+	fl.StringArrayVar(&opts.formFields, "form", nil, "Add a multipart form field.")
 	fl.StringArrayVarP(&opts.requestHeaders, "header", "H", nil, "Add an additional HTTP request header.")
 	fl.BoolVarP(&opts.showResponseHeaders, "include", "i", false, "Include HTTP response headers in the output.")
 	fl.BoolVar(&opts.paginate, "paginate", false, "Make additional HTTP requests to fetch all pages of results.")
-	fl.StringVar(&opts.requestInputFile, "input", "", "The file to use as the body for the HTTP request. Sent as 'application/json' unless you set another 'Content-Type' with --header.")
+	fl.StringVar(&opts.requestInputFile, "input", "", "The file to use as the body for the HTTP request.")
 	fl.BoolVar(&opts.silent, "silent", false, "Do not print the response body.")
 	fl.StringVar(&opts.outputFormat, "output", "json", "Format output as: json, ndjson.")
-	fl.StringArrayVar(&opts.placeholderFlags, "placeholder", nil, "Define a custom placeholder in <name>=<value> format, expanded from :<name>. Repeat the flag to define more than one.")
+	fl.StringArrayVar(&opts.placeholderFlags, "placeholder", nil, "Define a custom placeholder in <name>=<value> format.")
 
 	cmd.MarkFlagsMutuallyExclusive("paginate", "input")
 	cmd.MarkFlagsMutuallyExclusive("form", "field")
