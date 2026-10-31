@@ -1,4 +1,4 @@
-package commands
+package auth
 
 import (
 	"crypto/sha256"
@@ -63,7 +63,7 @@ func loadAuth() *AuthData {
 	return &authData
 }
 
-func requireLogin() {
+func RequireLogin() {
 	if !registered() {
 		fmt.Fprintln(os.Stderr, "Not registered. Run: vpn-tool auth register")
 		os.Exit(1)
